@@ -1,6 +1,16 @@
 <?php
 include('db.php');
 
+$query = mysqli_query($conn, "SELECT * FROM users");
+
+$row = mysqli_fetch_assoc($query);
+
+$name = $row['name'];
+$id = $row['id'];
+$pwd = $row['pwd'];
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -22,6 +32,14 @@ include('db.php');
         padding: 10px;
         background: whitesmoke;
     }
+
+    .info {
+background-color: whitesmoke;
+    border: 4px solid black;
+    border-radius: 5px;
+    width: 350px;
+    font-family: monospace;
+    }
 </style>
 <body>
 
@@ -32,71 +50,62 @@ include('db.php');
             <li><a href="index.php">Home</a></li>
             <li><a href="add.php">Tambah Rekod</a></li>
             <li><a href="view.php">View Rekod</a></li>
+              <li><a href="logout.php" onclick="return confirm('Adakah anda ingin Log keluar?');">Log Out</a></li>
         </ul>
     </div>
     <br>
     <center>
-        <div style="margin-bottom: 20px; font-family: sans-serif;">
-        
-       
-    </div>
+
+<div class="info">
+    <h2>Nama User: <?php echo $name; ?> </h2>
+    <h2>ID User: <?php echo $id; ?> </h2>
+    
+</div>
+<br>
+
   <table border="1" id="data-table" style="border-collapse: collapse; width: 80%; text-align: left; font-family: sans-serif;">
-        <thead>
+      
             <tr style="background-color: #2c3e50; color: black;">
-                <th style="padding: 10px;">Tarikh</th>
-                <th style="padding: 10px;">Lokasi</th>
-                <th style="padding: 10px;">Warden Terlibat</th>
-                <th style="padding: 10px;">Tarikh Pulang</th>
-                <th style="padding: 10px;">Penjaga</th>
-                <th style="padding: 10px;">Catatan</th>
+                <th style="padding: 10px;">Bil</th>
+                <th style="padding: 10px;">Tarikh Keluar</th>
+                <th style="padding: 10px;">Waktu keluar</th>
+                <th style="padding: 10px;">Tujuan/Destinasi</th>
+                <th style="padding: 10px;">TT Warden/Penyelia</th>
+                <th style="padding: 10px;">Tarikh Masuk</th>
+                <th style="padding: 10px;">Waktu Masuk</th>
+                <th style="padding: 10px;">TT Penjaga</th>
+                <th style="padding: 10px;">Catatan</th>                
+
             </tr>
-        </thead>
-        
-        <!-- JavaScript HANYA akan kacau kawasan tbody ini sahaja -->
-        <tbody>
+
+            <?php
+            include('db.php');
+
+            $bil = 1;
+           
+
+            $query = mysqli_query($conn, "SELECT * FROM record");
+
+            while ($row = mysqli_fetch_assoc($query)) {
+
+            echo "
+
             <tr>
-                <td colspan="6" style="text-align: center; color: #888; padding: 15px;">
-                   
-                </td>
-            </tr>
-        </tbody>
+            <td>".$bil++."</td>
+            <td>".$row['tarikh_keluar']."</td>
+            <td>".$row['waktu_keluar']."</td>
+            <td>".$row['tujuan']."</td>
+            <td>".$row['tt1']."</td>
+            <td>".$row['tarikh_masuk']."</td>
+            <td>".$row['waktu_masuk']."</td>
+            <td>".$row['tt2']."</td>
+            <td>".$row['catatan']."</td>
+            ";
+            }
+            ?>
     </table>
 </center>
 
-<script>
-document.getElementById('csv-file').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
 
-    const reader = new FileReader();
-    
-    reader.onload = function(e) {
-        const text = e.target.result;
-        const lines = text.split('\n');
-        
-        // Kita sasarkan TBODY, jadi THEAD (th) terselamat daripada dipadam
-        const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-        
-        // Kosongkan kandungan tbody sahaja
-        tableBody.innerHTML = '';
-
-        for (let i = 0; i < lines.length; i++) {
-            const rowText = lines[i].trim();
-            if (rowText === '') continue;
-
-            const columns = rowText.split(',');
-            const row = tableBody.insertRow();
-
-            for (let j = 0; j < 6; j++) {
-                const cell = row.insertCell();
-                cell.textContent = columns[j] ? columns[j].trim() : ''; 
-                cell.style.padding = '8px';
-            }
-        }
-    };
-
-    reader.readAsText(file);
-});
-</script>
 </body>
 </html>

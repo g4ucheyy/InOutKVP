@@ -8,6 +8,12 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+$query = mysqli_query($conn, "SELECT * FROM users");
+
+$row = mysqli_fetch_assoc($query);
+
+$name = $row['name'];
+
 
 ?>
 
@@ -39,7 +45,7 @@ if (!isset($_SESSION['user_id'])) {
         </ul>
     </div>
 
-    <marquee direction="right" id="grr">SELAMAT DATANG KE SISTEM InOutKVPJB!</marquee>
+    <marquee direction="right" id="grr">SELAMAT DATANG KE SISTEM InOutKVPJB, <?php echo $name; ?>!</marquee>
     
     
     <center>
