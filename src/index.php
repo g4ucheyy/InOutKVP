@@ -8,13 +8,16 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$query = mysqli_query($conn, "SELECT * FROM users");
+// Get the logged-in user's ID from the session
+$logged_in_id = $_SESSION['user_id'];
+
+// CRITICAL FIX: Only select the user that matches the logged-in session ID
+$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$logged_in_id'");
 
 $row = mysqli_fetch_assoc($query);
 
-$name = $row['name'];
-
-
+// Fallback to 'Pengguna' just in case data fails to fetch
+$name = $row['name'] ?? 'Pengguna'; 
 ?>
 
 <!DOCTYPE html>
@@ -45,16 +48,12 @@ $name = $row['name'];
         </ul>
     </div>
 
-    <marquee direction="right" id="grr">SELAMAT DATANG KE SISTEM InOutKVPJB, <?php echo $name; ?>!</marquee>
-    
+    <marquee direction="right" id="grr">SELAMAT DATANG KE SISTEM InOutKVPJB, <?php echo htmlspecialchars($name); ?>!</marquee>
     
     <center>
         <br>
         <img id="img1" src="img.jpg" width="350px" height="250px">
-        
     </center>
-
-
     
 </body>
 </html>

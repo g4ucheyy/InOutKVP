@@ -1,14 +1,25 @@
 <?php
+// 1. Start the session to catch the logged-in user data
+session_start();
 include('db.php');
 
-// Fetch user for the welcome message
-$query = mysqli_query($conn, "SELECT * FROM users LIMIT 1");
+// Redirect back to login page if they accessed this page without logging in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Get the current logged-in user's ID
+$logged_in_id = $_SESSION['user_id'];
+
+// 2. Fetch the ACTUAL logged-in user details for the welcome message
+$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$logged_in_id'");
 $row = mysqli_fetch_assoc($query);
 $name = $row['name'] ?? 'Pengguna'; // Fallback if no user found
 
 // Process form submission
 if (isset($_POST['Submit'])) {
-    // 1. Get form data and prevent SQL injection
+    // Get form data and prevent SQL injection
     $tarikh_keluar = mysqli_real_escape_string($conn, $_POST['tarikh_keluar']);
     $waktu_keluar  = mysqli_real_escape_string($conn, $_POST['waktu_keluar']);
     $tujuan        = mysqli_real_escape_string($conn, $_POST['tujuan']);
@@ -18,11 +29,11 @@ if (isset($_POST['Submit'])) {
     $tt2           = mysqli_real_escape_string($conn, $_POST['tt2']);
     $catatan       = mysqli_real_escape_string($conn, $_POST['catatan']);
 
-    // 2. SQL query matching your table columns
-    $sql = "INSERT INTO record (tarikh_keluar, waktu_keluar, tujuan, tt1, tarikh_masuk, waktu_masuk, tt2, catatan) 
-            VALUES ('$tarikh_keluar', '$waktu_keluar', '$tujuan', '$tt1', '$tarikh_masuk', '$waktu_masuk', '$tt2', '$catatan')";
+    // 3. CRITICAL FIX: Save the $logged_in_id inside the user_id column
+    $sql = "INSERT INTO record (tarikh_keluar, waktu_keluar, tujuan, tt1, tarikh_masuk, waktu_masuk, tt2, catatan, user_id) 
+            VALUES ('$tarikh_keluar', '$waktu_keluar', '$tujuan', '$tt1', '$tarikh_masuk', '$waktu_masuk', '$tt2', '$catatan', '$logged_in_id')";
 
-    // 3. Execute query and alert user
+    // Execute query and alert user
     if (mysqli_query($conn, $sql)) {
         echo "<script>alert('Rekod berjaya ditambah!'); window.location='view.php';</script>";
     } else {
@@ -76,7 +87,6 @@ if (isset($_POST['Submit'])) {
                 <input type="date" name="tarikh_keluar" required> <br>
                 
                 <label>Waktu Keluar</label><br>
-             
                 <input type="text" name="waktu_keluar" required> <br>
                 
                 <label>Tujuan</label><br>
@@ -89,7 +99,6 @@ if (isset($_POST['Submit'])) {
                 <input type="date" name="tarikh_masuk" required> <br>
                 
                 <label>Waktu Masuk</label><br>
-        
                 <input type="text" name="waktu_masuk" required> <br>
                 
                 <label>Tandatangan Penjaga</label><br>
